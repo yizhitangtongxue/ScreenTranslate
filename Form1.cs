@@ -1,29 +1,38 @@
 using System;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Windows.Forms;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Windows.Forms;
+using Tesseract;
+using Timer = System.Windows.Forms.Timer;
 
 namespace ScreenTranslate
 {
     public partial class Form1 : Form
     {
+        private Form2 form2;
+        private Timer timer;
 
-        // RECT 结构体用于存储窗口的位置信息（左、上、右、下）
-        [StructLayout(LayoutKind.Sequential)]
-        private struct RECT
-        {
-            public int Left;   // 窗口左上角 X 坐标
-            public int Top;    // 窗口左上角 Y 坐标
-            public int Right;  // 窗口右下角 X 坐标
-            public int Bottom; // 窗口右下角 Y 坐标
-        }
+        // 用于存储当前截图的内存中的图片
+        private Bitmap currentScreenshot;
 
         // 构造函数，初始化窗体
         public Form1()
         {
             InitializeComponent();
+            this.Resize += MainForm_Resize;
+
+            form2 = new Form2();
+            form2.Show();
+
+            timer = new Timer { Interval = 5000 };
+            timer.Tick += DoCapture;
+            timer.Start();
+        }
+
+        private void MainForm_Resize(object sender, EventArgs e)
+        {
+            this.extendedPanel1.Width = this.ClientSize.Width;
+            this.extendedPanel1.Height = this.ClientSize.Height;
         }
 
         // 在窗体加载时进行初始化设置
@@ -38,45 +47,86 @@ namespace ScreenTranslate
             TopMost = true;
         }
 
-        // 按钮点击事件：查找指定标题的窗口并获取窗口的文本和区域信息
-        private void Button_Click(object sender, EventArgs e)
+        private void DoCapture(object sender, EventArgs e)
         {
             // 清空文本框内容
-            this.textBox1.Clear();
+            this.form2.ClearTextBox();
 
-            // 获取当前时间并格式化
-            DateTime currentTime = DateTime.Now;
-            string formattedTime = currentTime.ToString("yyyy-MM-dd HH:mm:ss");
-            this.textBox1.Text = formattedTime;
+            // 获取截屏区域
             Point point = extendedPanel1.PointToScreen(Point.Empty);
-            // 指定截屏区域（比如左上角起点为(100,100)，宽800，高600）
-            Rectangle captureArea = new Rectangle(point.X,point.Y, this.extendedPanel1.Width, this.extendedPanel1.Height);
+            Rectangle captureArea = new Rectangle(point.X, point.Y, this.extendedPanel1.Width, this.extendedPanel1.Height);
 
-            // 创建Bitmap对象，大小与截屏区域一致
-            using (Bitmap bmp = new Bitmap(captureArea.Width, captureArea.Height))
+            // 创建新的截图
+            Bitmap newScreenshot = new Bitmap(captureArea.Width, captureArea.Height);
+            using (Graphics g = Graphics.FromImage(newScreenshot))
             {
-                // 使用Graphics对象截取指定区域的屏幕
-                using (Graphics g = Graphics.FromImage(bmp))
+                g.CopyFromScreen(captureArea.Location, Point.Empty, captureArea.Size);
+            }
+
+            // 释放旧的截图资源
+            currentScreenshot?.Dispose();
+
+            // 更新为新的截图
+            currentScreenshot = newScreenshot;
+
+            String ocrRes = ExtractTextFromBitmap(currentScreenshot);
+            this.form2.UpdateTextBox(ocrRes);
+
+        }
+
+        public string ExtractTextFromBitmap(Bitmap bitmap)
+        {
+            // 将Bitmap转换为MemoryStream
+            using (var ms = new MemoryStream())
+            {
+                // 将Bitmap保存到MemoryStream
+                bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+
+                // 使用Tesseract进行OCR识别
+                using (var engine = new TesseractEngine(@"./tessdata", "eng", EngineMode.Default))
                 {
-                    g.CopyFromScreen(captureArea.Location, Point.Empty, captureArea.Size);
+                    // 从MemoryStream读取图片
+                    using (var img = Pix.LoadFromMemory(ms.ToArray()))
+                    {
+                        // 识别图片中的文字并返回
+                        var page = engine.Process(img);
+                        return page.GetText();
+                    }
                 }
-
-                // 保存图片到文件
-                string filePath = $"Screenshot_{DateTime.Now:yyyyMMdd_HHmmss}.png";
-                bmp.Save(filePath, ImageFormat.Png);
-
-                // 显示保存路径
-                //MessageBox.Show($"截图已保存到: {filePath}", "截图成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-
             }
         }
 
-
-        // 按钮点击事件调用 Button_Click 方法
-        private void button1_Click(object sender, EventArgs e)
+        public string ExtractTextFromImage(string imagePath)
         {
-            this.Button_Click(sender, e);
+            using (var engine = new TesseractEngine(@"./tessdata", "eng", EngineMode.Default))
+            {
+                using (var img = Pix.LoadFromFile(imagePath))
+                {
+                    var page = engine.Process(img);
+                    return page.GetText();
+                }
+            }
+        }
+
+        public string ExtractTextFromImageInMemory(byte[] imageData)
+        {
+            // 将图片数据转换为MemoryStream
+            using (var ms = new MemoryStream(imageData))
+            {
+                // 使用Tesseract进行OCR识别
+                using (var engine = new TesseractEngine(@"./tessdata", "eng", EngineMode.Default))
+                {
+                    // 加载图片流
+                    using (var img = Pix.LoadFromMemory(ms.ToArray()))
+                    {
+                        // 识别图片中的文字并返回
+                        var page = engine.Process(img);
+                        return page.GetText();
+                    }
+                }
+            }
         }
     }
+
+
 }
