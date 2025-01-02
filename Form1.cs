@@ -2,7 +2,7 @@ using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
-using IronOcr;
+using Tesseract;
 using Timer = System.Windows.Forms.Timer;
 
 namespace ScreenTranslate
@@ -76,14 +76,25 @@ namespace ScreenTranslate
 
         public string ExtractTextFromBitmap(Bitmap bitmap)
         {
-       
-            string Text = new IronTesseract().Read(bitmap).Text;
-
-            return Text;
-           
+            // 将Bitmap转换为MemoryStream
+            using (var ms = new MemoryStream())
+            {
+                // 将Bitmap保存到MemoryStream
+                bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                // 使用Tesseract进行OCR识别
+                using (var engine = new TesseractEngine(@"./tessdata", "eng", EngineMode.Default))
+                {
+                    // 从MemoryStream读取图片
+                    using (var img = Pix.LoadFromMemory(ms.ToArray()))
+                    {
+                        // 识别图片中的文字并返回
+                        var page = engine.Process(img);
+                        return page.GetText();
+                    }
+                }
+            }
         }
 
-   
     }
 
 

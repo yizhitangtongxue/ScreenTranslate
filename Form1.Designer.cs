@@ -34,18 +34,18 @@
             // extendedPanel1
             // 
             extendedPanel1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            extendedPanel1.Location = new Point(-3, 2);
+            extendedPanel1.Location = new Point(-2, 1);
             extendedPanel1.Margin = new Padding(0);
             extendedPanel1.Name = "extendedPanel1";
-            extendedPanel1.Size = new Size(1242, 157);
+            extendedPanel1.Size = new Size(621, 86);
             extendedPanel1.TabIndex = 1;
-            // 
             // Form1
             // 
-            AutoScaleDimensions = new SizeF(14F, 31F);
+            AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1242, 160);
+            ClientSize = new Size(621, 88);
             Controls.Add(extendedPanel1);
+            Margin = new Padding(2, 2, 2, 2);
             Name = "Form1";
             Text = "选区翻译工具";
             Load += Form1_Load;
