@@ -70,6 +70,9 @@ namespace ScreenTranslate
             currentScreenshot = newScreenshot;
 
             String ocrRes = ExtractTextFromBitmap(currentScreenshot);
+            if (ocrRes != null) {
+                ocrRes = Translate(ocrRes);
+            }
             this.form2.UpdateTextBox(ocrRes);
 
         }
@@ -94,6 +97,14 @@ namespace ScreenTranslate
                 }
             }
         }
+
+        public string Translate(String originText)
+        {
+            String res = "";
+
+            return res;
+        }
+
 
     }
 
