@@ -2,7 +2,7 @@ using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
-using Tesseract;
+using IronOcr;
 using Timer = System.Windows.Forms.Timer;
 
 namespace ScreenTranslate
@@ -76,56 +76,14 @@ namespace ScreenTranslate
 
         public string ExtractTextFromBitmap(Bitmap bitmap)
         {
-            // 将Bitmap转换为MemoryStream
-            using (var ms = new MemoryStream())
-            {
-                // 将Bitmap保存到MemoryStream
-                bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+       
+            string Text = new IronTesseract().Read(bitmap).Text;
 
-                // 使用Tesseract进行OCR识别
-                using (var engine = new TesseractEngine(@"./tessdata", "eng", EngineMode.Default))
-                {
-                    // 从MemoryStream读取图片
-                    using (var img = Pix.LoadFromMemory(ms.ToArray()))
-                    {
-                        // 识别图片中的文字并返回
-                        var page = engine.Process(img);
-                        return page.GetText();
-                    }
-                }
-            }
+            return Text;
+           
         }
 
-        public string ExtractTextFromImage(string imagePath)
-        {
-            using (var engine = new TesseractEngine(@"./tessdata", "eng", EngineMode.Default))
-            {
-                using (var img = Pix.LoadFromFile(imagePath))
-                {
-                    var page = engine.Process(img);
-                    return page.GetText();
-                }
-            }
-        }
-
-        public string ExtractTextFromImageInMemory(byte[] imageData)
-        {
-            // 将图片数据转换为MemoryStream
-            using (var ms = new MemoryStream(imageData))
-            {
-                // 使用Tesseract进行OCR识别
-                using (var engine = new TesseractEngine(@"./tessdata", "eng", EngineMode.Default))
-                {
-                    // 加载图片流
-                    using (var img = Pix.LoadFromMemory(ms.ToArray()))
-                    {
-                        // 识别图片中的文字并返回
-                        var page = engine.Process(img);
-                        return page.GetText();
-                    }
-                }
-            }
-        }
+   
     }
 
 

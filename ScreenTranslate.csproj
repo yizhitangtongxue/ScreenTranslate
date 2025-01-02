@@ -9,11 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Tesseract" Version="5.2.0" />
+    <Folder Include="tessdata\" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="tessdata\" />
+    <PackageReference Include="IronOcr" Version="2024.12.2" />
   </ItemGroup>
 
 </Project>
