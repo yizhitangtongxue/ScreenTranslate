@@ -1,6 +1,6 @@
 ﻿namespace ScreenTranslate
 {
-    partial class Form2
+    partial class ResultForm
     {
         /// <summary>
         /// Required designer variable.

@@ -2,6 +2,8 @@ using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
+using TencentCloud.Common;
+using TencentCloud.Tmt.V20180321;
 using Tesseract;
 using Timer = System.Windows.Forms.Timer;
 
@@ -9,7 +11,7 @@ namespace ScreenTranslate
 {
     public partial class Form1 : Form
     {
-        private Form2 form2;
+        private ResultForm form2;
         private Timer timer;
 
         // 用于存储当前截图的内存中的图片
@@ -19,9 +21,10 @@ namespace ScreenTranslate
         public Form1()
         {
             InitializeComponent();
+
             this.Resize += MainForm_Resize;
 
-            form2 = new Form2();
+            form2 = new ResultForm();
             form2.Show();
 
             timer = new Timer { Interval = 5000 };
@@ -70,10 +73,12 @@ namespace ScreenTranslate
             currentScreenshot = newScreenshot;
 
             String ocrRes = ExtractTextFromBitmap(currentScreenshot);
-            if (ocrRes != null) {
-                ocrRes = Translate(ocrRes);
+            if (!string.IsNullOrEmpty(ocrRes)) {
+                String translateRes = Translate(ocrRes);
+
+                this.form2.UpdateTextBox(translateRes);
             }
-            this.form2.UpdateTextBox(ocrRes);
+            
 
         }
 
@@ -98,10 +103,40 @@ namespace ScreenTranslate
             }
         }
 
+        // 重写 WndProc 方法捕获窗口消息
+        protected override void WndProc(ref Message m)
+        {
+            const int WM_NCLBUTTONDBLCLK = 0xA3; // 标题栏双击消息
+
+            if (m.Msg == WM_NCLBUTTONDBLCLK)
+            {
+                // 捕获到标题栏双击事件
+                OpenSettings();
+                return; // 阻止默认行为（如窗口最大化/还原）
+            }
+
+            base.WndProc(ref m);
+        }
+
+        // 打开设置窗口的方法
+        private void OpenSettings()
+        {
+
+            // 例如，显示一个设置窗体
+            SettingForm settingsForm = new SettingForm();
+            settingsForm.ShowDialog();
+        }
+
         public string Translate(String originText)
         {
-            String res = "";
+            //Credential cred = new Credential
+            //{
+            //    SecretId = this.secretIdText.Text,
+            //    SecretKey = this.secretKeyText.Text
+            //};
 
+            String res = "";
+            
             return res;
         }
 

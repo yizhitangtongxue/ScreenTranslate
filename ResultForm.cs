@@ -10,9 +10,9 @@ using System.Windows.Forms;
 
 namespace ScreenTranslate
 {
-    public partial class Form2 : Form
+    public partial class ResultForm : Form
     {
-        public Form2()
+        public ResultForm()
         {
             InitializeComponent();
             this.TopLevel = true;
