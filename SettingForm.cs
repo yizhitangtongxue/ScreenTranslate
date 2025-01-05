@@ -43,7 +43,9 @@ namespace ScreenTranslate
 
         private void ok_btn_Click(object sender, EventArgs e)
         {
-
+            var db = SqlSugarHelper.GetSugar();
+            db.Updateable(new KeyConfigEntity( ) { AccessKey = this.AccessKeyLabel.Text,SecretKey = this.SecretKeyLabel.Text }).Where(it => it.Id.Equals(1)).ExecuteCommand();
+            this.Close();
         }
     }
 }

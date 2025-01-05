@@ -3,7 +3,9 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
 using TencentCloud.Common;
+using TencentCloud.Common.Profile;
 using TencentCloud.Tmt.V20180321;
+using TencentCloud.Tmt.V20180321.Models;
 using Tesseract;
 using Timer = System.Windows.Forms.Timer;
 
@@ -16,6 +18,9 @@ namespace ScreenTranslate
 
         // 用于存储当前截图的内存中的图片
         private Bitmap currentScreenshot;
+
+        public string AccessKey { get; private set; }
+        public string SecretKey { get; private set; }
 
         // 构造函数，初始化窗体
         public Form1()
@@ -76,6 +81,8 @@ namespace ScreenTranslate
             if (!string.IsNullOrEmpty(ocrRes)) {
                 String translateRes = Translate(ocrRes);
 
+         
+
                 this.form2.UpdateTextBox(translateRes);
             }
             
@@ -129,15 +136,29 @@ namespace ScreenTranslate
 
         public string Translate(String originText)
         {
-            //Credential cred = new Credential
-            //{
-            //    SecretId = this.secretIdText.Text,
-            //    SecretKey = this.secretKeyText.Text
-            //};
+            var db = SqlSugarHelper.GetSugar();
+            var res = db.Queryable<KeyConfigEntity>().InSingle(1);
+            if (res != null)
+            {
+                this.AccessKey = res.AccessKey;
+                this.SecretKey = res.SecretKey;
 
-            String res = "";
-            
-            return res;
+                Credential cred = new Credential
+                {
+                    SecretId = this.AccessKey,
+                    SecretKey = this.SecretKey
+                };
+
+                TmtClient tmt = new TmtClient(cred, "ap-guangzhou", new ClientProfile { Language = Language.ZH_CN });
+                var req = new TextTranslateRequest { Source = "auto",Target="zh",ProjectId = 1329154,SourceText=originText };
+
+                var tres = tmt.TextTranslateSync(req);
+
+                Console.WriteLine(tres);
+                return $"目标语言为：{tres.Source}，翻译结果：{tres.TargetText}";
+            }
+
+            return "未识别到文字";
         }
 
 
