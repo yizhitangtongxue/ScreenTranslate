@@ -22,6 +22,8 @@ namespace ScreenTranslate
         public string AccessKey { get; private set; }
         public string SecretKey { get; private set; }
 
+        private bool NoError { get; set; }
+
         // 构造函数，初始化窗体
         public Form1()
         {
@@ -138,7 +140,7 @@ namespace ScreenTranslate
         {
             var db = SqlSugarHelper.GetSugar();
             var res = db.Queryable<KeyConfigEntity>().InSingle(1);
-            if (res != null)
+            if (res != null && (!res.AccessKey.Equals("access") && !res.SecretKey.Equals("secret")))
             {
                 this.AccessKey = res.AccessKey;
                 this.SecretKey = res.SecretKey;
