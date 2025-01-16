@@ -34,11 +34,13 @@
             AccessKey = new Label();
             SecretKeyLabel = new TextBox();
             SecretKey = new Label();
+            QwenTokenLabel = new Label();
+            textBox1 = new TextBox();
             SuspendLayout();
             // 
             // ok_btn
             // 
-            ok_btn.Location = new Point(14, 126);
+            ok_btn.Location = new Point(14, 170);
             ok_btn.Margin = new Padding(2);
             ok_btn.Name = "ok_btn";
             ok_btn.Size = new Size(180, 43);
@@ -49,7 +51,7 @@
             // 
             // s
             // 
-            s.Location = new Point(208, 126);
+            s.Location = new Point(208, 170);
             s.Margin = new Padding(2);
             s.Name = "s";
             s.Size = new Size(180, 43);
@@ -95,11 +97,31 @@
             SecretKey.TabIndex = 5;
             SecretKey.Text = "SecretKey：";
             // 
+            // QwenTokenLabel
+            // 
+            QwenTokenLabel.Font = new Font("Microsoft YaHei UI", 9F);
+            QwenTokenLabel.Location = new Point(4, 125);
+            QwenTokenLabel.Margin = new Padding(2, 0, 2, 0);
+            QwenTokenLabel.Name = "QwenTokenLabel";
+            QwenTokenLabel.Size = new Size(86, 43);
+            QwenTokenLabel.TabIndex = 7;
+            QwenTokenLabel.Text = "QwenKey：";
+            // 
+            // textBox1
+            // 
+            textBox1.Location = new Point(94, 122);
+            textBox1.Margin = new Padding(2);
+            textBox1.Name = "textBox1";
+            textBox1.Size = new Size(292, 23);
+            textBox1.TabIndex = 6;
+            // 
             // SettingForm
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(400, 192);
+            ClientSize = new Size(400, 240);
+            Controls.Add(QwenTokenLabel);
+            Controls.Add(textBox1);
             Controls.Add(SecretKey);
             Controls.Add(SecretKeyLabel);
             Controls.Add(AccessKey);
@@ -122,5 +144,7 @@
         private Label AccessKey;
         private TextBox SecretKeyLabel;
         private Label SecretKey;
+        private Label QwenTokenLabel;
+        private TextBox textBox1;
     }
 }

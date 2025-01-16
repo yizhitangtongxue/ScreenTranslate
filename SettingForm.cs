@@ -26,6 +26,7 @@ namespace ScreenTranslate
             var db = SqlSugarHelper.GetSugar();
             var res = db.Queryable<KeyConfigEntity>().InSingle(1);
             if (res != null) {
+                this.QwenTokenLabel.Text = res.QwenToken;
                 this.AccessKeyLabel.Text = res.AccessKey;
                 this.SecretKeyLabel.Text = res.SecretKey;
             }
